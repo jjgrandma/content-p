@@ -287,7 +287,23 @@ export default function MLPredictorPanel({ theme = 'cosmic' }: MLPredictorPanelP
     setIsSubmitted(false);
 
     try {
-      const predResult = await mockPredictionEngine(form);
+      // Live HTTP call to the Node.js Express server backend
+      const response = await fetch('/api/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(form)
+      });
+
+      let predResult: PredictionResult;
+      if (response.ok) {
+        predResult = await response.json();
+      } else {
+        console.warn('Backend API returned error, falling back to local simulation metrics');
+        predResult = await mockPredictionEngine(form);
+      }
+
       setResult(predResult);
       setPredictionHistory(prev => {
         const filtered = prev.filter(p => p.title.toLowerCase() !== predResult.title.toLowerCase());
@@ -296,7 +312,13 @@ export default function MLPredictorPanel({ theme = 'cosmic' }: MLPredictorPanelP
         return nextList;
       });
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching prediction from Express server. Running local fallback:', err);
+      try {
+        const predResult = await mockPredictionEngine(form);
+        setResult(predResult);
+      } catch (innerErr) {
+        console.error(innerErr);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -742,6 +764,60 @@ export default function MLPredictorPanel({ theme = 'cosmic' }: MLPredictorPanelP
                   ))}
                 </div>
               </div>
+
+              {/* Pre-Trained Pipeline Telemetry Logs */}
+              {result.modelLogs && result.modelLogs.length > 0 && (
+                <div className="space-y-3 border-t border-slate-800/60 pt-4">
+                  <div className="flex items-center justify-between">
+                    <h5 className="text-[11.5px] font-mono font-bold uppercase tracking-wider text-slate-350 flex items-center gap-1.5">
+                      <Cpu className="h-3.5 w-3.5 text-pink-500 shrink-0" />
+                      <span>Pre-Trained Pipeline Extractor Logs</span>
+                    </h5>
+                    <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 bg-violet-950/45 text-violet-300 border border-violet-800/40 rounded">
+                      Live Backend Sync
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {result.modelLogs.map((log, lIdx) => (
+                      <div 
+                        key={lIdx} 
+                        className={`p-3 rounded-lg border transition-all ${
+                          theme === 'cosmic' 
+                            ? 'bg-slate-900/40 border-slate-800/80 shadow-sm' 
+                            : 'bg-[#15233c]/25 border-slate-800/50 shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-[10px] font-bold ${
+                            log.category === 'Forecasting' 
+                              ? 'text-emerald-400' 
+                              : log.category === 'Video Analysis' 
+                              ? 'text-pink-400' 
+                              : 'text-amber-400'
+                          }`}>
+                            {log.category}
+                          </span>
+                          <span className="text-[9px] font-mono font-semibold text-slate-500">
+                            Conf: {(log.confidence * 100).toFixed(0)}%
+                          </span>
+                        </div>
+                        <h6 className="text-[11px] font-sans font-bold text-white leading-tight mb-2">
+                          {log.modelName}
+                        </h6>
+                        <ul className="space-y-1 text-[9.5px] font-mono text-slate-400 leading-normal">
+                          {log.signalsDetected.map((sig, sIdx) => (
+                            <li key={sIdx} className="flex items-start gap-1">
+                              <span className="text-slate-600 shrink-0 font-bold">•</span>
+                              <span>{sig}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Interactive Prediction Verification Feedback widget */}
               <div id="prediction-feedback-widget" className="bg-slate-900/50 border border-slate-800/70 rounded-xl p-3.5 space-y-3">

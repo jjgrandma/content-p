@@ -31,6 +31,14 @@ export interface PredictionInput {
   hookTime: number; // first hook in seconds (e.g. 3s)
 }
 
+export interface ModelExecutionLog {
+  modelName: string;
+  category: 'Forecasting' | 'Video Analysis' | 'Text Analysis';
+  confidence: number;
+  runtimeMs: number;
+  signalsDetected: string[];
+}
+
 export interface PredictionResult {
   title: string;
   platform: 'YouTube' | 'TikTok' | 'Instagram';
@@ -46,6 +54,7 @@ export interface PredictionResult {
     priority: 'High' | 'Medium' | 'Low';
     category: 'Content' | 'Visual' | 'SEO';
   }[];
+  modelLogs?: ModelExecutionLog[];
 }
 
 export interface ChartDataPoint {
