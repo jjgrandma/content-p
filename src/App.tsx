@@ -8,6 +8,7 @@ import VideoList from './components/VideoList';
 import MLPredictorPanel from './components/MLPredictorPanel';
 import SettingsView from './components/SettingsView';
 import VideoInsightsView from './components/VideoInsightsView';
+import EngagementHeatmap from './components/EngagementHeatmap';
 import { 
   Menu, 
   X, 
@@ -329,6 +330,17 @@ export default function App() {
 
               {/* Row B: Dual Axis Analytics trend diagram */}
               <AnalyticsCharts data={activeChartData} theme={theme} />
+
+              {/* Row B.5: Interactive calendar-based activity heatmap */}
+              <EngagementHeatmap 
+                theme={theme} 
+                onSelectSlot={() => {
+                  const el = document.getElementById('ml-predictive-panel');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              />
 
               {/* Row C: Two-column layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
