@@ -3,9 +3,10 @@ import { MetricSummary } from '../types';
 
 interface DashboardMetricsProps {
   summary: MetricSummary;
+  theme?: 'cosmic' | 'executive';
 }
 
-export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
+export default function DashboardMetrics({ summary, theme = 'cosmic' }: DashboardMetricsProps) {
   const cards = [
     {
       id: 'metric-views',
@@ -61,7 +62,11 @@ export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
           <div
             key={card.id}
             id={card.id}
-            className={`group relative overflow-hidden bg-slate-900/90 border border-slate-800 rounded-xl p-5 transition-all duration-300 hover:border-slate-700/80 hover:-translate-y-0.5 ${card.glowClass}`}
+            className={`group relative overflow-hidden rounded-xl p-5 transition-all duration-300 hover:-translate-y-0.5 ${
+              theme === 'cosmic'
+                ? 'bg-slate-900/90 border border-slate-800 hover:border-slate-700/80'
+                : 'bg-[#121c2d]/70 border border-slate-850 hover:border-slate-700/60'
+            } ${card.glowClass}`}
           >
             {/* Soft decorative background glow */}
             <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-full bg-slate-800/20 transition-all duration-300 group-hover:bg-slate-800/40" />

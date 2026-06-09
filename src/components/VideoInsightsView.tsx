@@ -19,12 +19,13 @@ import { getThumbnailGradient } from '../data';
 interface VideoInsightsViewProps {
   videos: Video[];
   onSelectVideo: (video: Video) => void;
+  theme?: 'cosmic' | 'executive';
 }
 
 type SortField = 'views' | 'likes' | 'comments' | 'shares' | 'engagementRate' | 'duration';
 type SortOrder = 'asc' | 'desc';
 
-export default function VideoInsightsView({ videos, onSelectVideo }: VideoInsightsViewProps) {
+export default function VideoInsightsView({ videos, onSelectVideo, theme = 'cosmic' }: VideoInsightsViewProps) {
   const [search, setSearch] = useState('');
   const [platform, setPlatform] = useState<'All' | 'YouTube' | 'TikTok' | 'Instagram'>('All');
   const [sortField, setSortField] = useState<SortField>('views');
@@ -87,9 +88,13 @@ export default function VideoInsightsView({ videos, onSelectVideo }: VideoInsigh
         </button>
       </div>
 
-      <div className="bg-slate-950/40 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+      <div className={`border rounded-2xl p-5 shadow-xl space-y-4 transition-colors duration-300 ${
+        theme === 'cosmic'
+          ? 'bg-slate-950/40 border-slate-800'
+          : 'bg-[#121c2d]/50 border border-slate-850/80'
+      }`}>
         {/* Table Filters control row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-900 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-905 pb-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
             <input
@@ -97,21 +102,29 @@ export default function VideoInsightsView({ videos, onSelectVideo }: VideoInsigh
               placeholder="Search table by header or keyword..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-850 rounded-lg pl-9 pr-4 py-2 text-xs text-slate-100 placeholder:text-slate-550 focus:outline-none focus:border-slate-700"
+              className={`w-full border rounded-lg pl-9 pr-4 py-2 text-xs placeholder:text-slate-550 focus:outline-none transition-colors duration-305 ${
+                theme === 'cosmic'
+                  ? 'bg-slate-900 border-slate-855 text-slate-100 focus:border-slate-700'
+                  : 'bg-[#15233c] border-slate-800/60 text-zinc-100 focus:border-slate-700'
+              }`}
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 animate-fade-in">
             <SlidersHorizontal className="h-4 w-4 text-slate-500 shrink-0" />
-            <div className="flex bg-slate-900 border border-slate-850 p-0.5 rounded-lg select-none">
+            <div className={`border p-0.5 rounded-lg select-none flex ${
+              theme === 'cosmic' ? 'bg-slate-900 border-slate-850' : 'bg-[#15233c] border-slate-800/60'
+            }`}>
               {(['All', 'YouTube', 'TikTok', 'Instagram'] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPlatform(p)}
-                  className={`px-3 py-1 text-[11px] font-medium rounded-md transition-all ${
+                  className={`px-3 py-1 text-[11px] font-medium rounded-md transition-all cursor-pointer ${
                     platform === p
-                      ? 'bg-slate-850 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? theme === 'cosmic'
+                        ? 'bg-slate-850 text-white'
+                        : 'bg-[#22334e] text-cyan-300'
+                      : 'text-slate-400 hover:text-slate-205'
                   }`}
                 >
                   {p}

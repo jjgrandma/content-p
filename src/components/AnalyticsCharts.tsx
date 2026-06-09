@@ -16,10 +16,14 @@ import { TrendingUp, Award, Calendar, CircleUser } from 'lucide-react';
 
 interface AnalyticsChartsProps {
   data?: ChartDataPoint[];
+  theme?: 'cosmic' | 'executive';
 }
 
-export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChartsProps) {
+export default function AnalyticsCharts({ data = mockChartData, theme = 'cosmic' }: AnalyticsChartsProps) {
   const [timeframe, setTimeframe] = useState<'30d' | '14d' | '7d'>('30d');
+
+  const viewsColor = theme === 'cosmic' ? '#8b5cf6' : '#0ea5e9';
+  const engagementColor = theme === 'cosmic' ? '#34d399' : '#10b981';
 
   // Filter mock data dynamically based on selected timeframe
   const filteredData = useMemo(() => {
@@ -57,8 +61,12 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
           <div className="space-y-2.5">
             {payload.map((item: any, idx: number) => {
               const isViews = item.dataKey === 'views';
-              const dotColor = isViews ? 'bg-violet-500' : 'bg-emerald-400';
-              const textColor = isViews ? 'text-violet-300' : 'text-emerald-300';
+              const dotColor = isViews 
+                ? (theme === 'cosmic' ? 'bg-violet-500' : 'bg-cyan-500') 
+                : (theme === 'cosmic' ? 'bg-emerald-400' : 'bg-teal-500');
+              const textColor = isViews 
+                ? (theme === 'cosmic' ? 'text-violet-300' : 'text-cyan-300') 
+                : (theme === 'cosmic' ? 'text-emerald-300' : 'text-teal-300');
               const labelText = isViews ? 'Accumulated Views' : 'Daily Engagement';
               
               return (
@@ -85,11 +93,15 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
   };
 
   return (
-    <div id="analytics-charts" className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col h-[420px]">
+    <div id="analytics-charts" className={`rounded-2xl p-6 shadow-xl flex flex-col h-[420px] transition-colors duration-300 ${
+      theme === 'cosmic'
+        ? 'bg-slate-950/40 border border-slate-800/80'
+        : 'bg-[#121c2d]/50 border border-slate-850/80'
+    }`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
+            <span className={`h-2 w-2 rounded-full animate-pulse ${theme === 'cosmic' ? 'bg-violet-500' : 'bg-cyan-400'}`} />
             <h3 className="font-display font-bold text-lg text-white tracking-tight">
               Video Performance Trends
             </h3>
@@ -100,15 +112,19 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
         </div>
 
         {/* Timeframe selector controls */}
-        <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg select-none self-start">
+        <div className={`flex items-center p-0.5 rounded-lg select-none self-start border ${
+          theme === 'cosmic' ? 'bg-slate-900 border-slate-800' : 'bg-[#15233c] border-slate-800/60'
+        }`}>
           {(['7d', '14d', '30d'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTimeframe(t)}
-              className={`px-3 py-1 text-xs font-mono font-medium rounded-md transition-all duration-200 ${
+              className={`px-3 py-1 text-xs font-mono font-medium rounded-md transition-all duration-200 cursor-pointer ${
                 timeframe === t
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? theme === 'cosmic'
+                    ? 'bg-slate-805 text-white shadow-sm'
+                    : 'bg-[#22334e] text-cyan-300 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-205'
               }`}
             >
               {t.toUpperCase()}
@@ -127,8 +143,8 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
             {/* Smooth Royal Gradient for Area Chart */}
             <defs>
               <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
+                <stop offset="5%" stopColor={viewsColor} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={viewsColor} stopOpacity={0.0} />
               </linearGradient>
             </defs>
 
@@ -151,7 +167,7 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
             {/* Left Y Axis for cumulative views */}
             <YAxis
               yAxisId="left"
-              stroke="#8b5cf6"
+              stroke={viewsColor}
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -162,7 +178,7 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke="#34d399"
+              stroke={engagementColor}
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -189,7 +205,7 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
               type="monotone"
               dataKey="views"
               name="Accumulated Views"
-              stroke="#8b5cf6"
+              stroke={viewsColor}
               strokeWidth={2.5}
               fillOpacity={1}
               fill="url(#viewsGradient)"
@@ -200,7 +216,7 @@ export default function AnalyticsCharts({ data = mockChartData }: AnalyticsChart
               yAxisId="right"
               dataKey="engagement"
               name="Engagement Velocity"
-              fill="#34d399"
+              fill={engagementColor}
               radius={[4, 4, 0, 0]}
               barSize={8}
             />

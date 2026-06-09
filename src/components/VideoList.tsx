@@ -19,9 +19,10 @@ interface VideoListProps {
   videos: Video[];
   selectedVideoId: string | null;
   onSelectVideo: (video: Video) => void;
+  theme?: 'cosmic' | 'executive';
 }
 
-export default function VideoList({ videos, selectedVideoId, onSelectVideo }: VideoListProps) {
+export default function VideoList({ videos, selectedVideoId, onSelectVideo, theme = 'cosmic' }: VideoListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [platformFilter, setPlatformFilter] = useState<'All' | 'YouTube' | 'TikTok' | 'Instagram'>('All');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Viral' | 'Steady' | 'Needs Work'>('All');
@@ -57,31 +58,43 @@ export default function VideoList({ videos, selectedVideoId, onSelectVideo }: Vi
   };
 
   return (
-    <div id="video-list-panel" className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col h-[600px]">
+    <div id="video-list-panel" className={`p-5 shadow-xl flex flex-col h-[600px] rounded-2xl transition-colors duration-300 ${
+      theme === 'cosmic'
+        ? 'bg-slate-950/40 border border-slate-800/80'
+        : 'bg-[#121c2d]/50 border border-slate-850/80'
+    }`}>
       {/* Header and Counters */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="font-display font-bold text-lg text-white tracking-tight">
             Published Content
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-405">
             Select a video below to view precise interactive telemetry.
           </p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-md text-xs font-mono text-violet-400">
+        <div className={`border px-2.5 py-1 rounded-md text-xs font-mono transition-colors duration-300 ${
+          theme === 'cosmic' 
+            ? 'bg-slate-900 border-slate-800 text-violet-400' 
+            : 'bg-[#15233c] border-slate-800/80 text-cyan-400'
+        }`}>
           Showing {filteredVideos.length}/{videos.length}
         </div>
       </div>
 
       {/* Action bar: Search Input */}
-      <div className="relative mb-3">
+      <div className="relative mb-3 animate-fade-in">
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
         <input
           type="text"
           placeholder="Search videos by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-slate-700 font-sans"
+          className={`w-full border rounded-xl pl-9 pr-4 py-2 text-sm placeholder:text-slate-500 focus:outline-none font-sans transition-colors duration-300 ${
+            theme === 'cosmic'
+              ? 'bg-slate-900 border-slate-800 text-slate-100 focus:border-slate-700'
+              : 'bg-[#15233c] border-slate-800/60 text-zinc-100 focus:border-slate-700/80'
+          }`}
         />
       </div>
 
